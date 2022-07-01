@@ -1,0 +1,38 @@
+{
+    "name":"意象",
+    "children":[
+        {
+            "name":"植物",
+            
+            "children":[
+                {"name":"蔬菜","typenum":38},
+                {"name":"谷物","typenum":24},
+                {"name":"瓜果","typenum":37},
+                {"name":"草","typenum":15},
+                {"name":"木","typenum":43},
+                {"name":"观赏","typenum":8}
+                
+            ]
+
+        },
+        {
+            "name":"动物",
+           
+            "children":[
+                {"name":"鸟","typenum":35},
+                {"name":"兽","typenum":26},
+                {"name":"虫","typenum":32},
+                {"name":"鱼","typenum":15}
+            ]
+        },
+        {
+            "name":"景",
+           
+            "children":[
+                {"name":"山水","typenum":2},
+                {"name":"气候","typenum":7},
+                {"name":"天文", "typenum":3}
+            ]
+        }
+    ]
+}

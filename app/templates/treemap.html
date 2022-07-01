@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<style>
+    .tooltip{
+        position: absolute;
+        width: 120;
+        height: auto;
+        font-family: '华文行楷';
+        font-size: 14px;
+        text-align: center;
+        border-style: solid; 
+        border-width: 1px;
+        background-color: fdffe0;
+        border-radius: 5px;
+    }
+</style>
+</head>
+<body>
+
+    <div style="position:absolute;left:30%"></div>
+    <script src="static/js/d3.v7.js"></script>
+    <script>
+        
+        var width=550;
+        var height=450;
+        
+        var svg = d3.select("body")
+        .append("svg")			
+		.attr("width", width)	
+		.attr("height", height);
+        var treemap = d3.treemap()
+        .size([width, height])
+        .tile(function(node, x0, y0, x1, y1){
+                        d3.treemapBinary(node, 0, 0, width, height);
+                        for (const child of node.children) {
+                            child.x0 = x0 + child.x0 / width * (x1 - x0);
+                            child.x1 = x0 + child.x1 / width * (x1 - x0);
+                            child.y0 = y0 + child.y0 / height * (y1 - y0);
+                            child.y1 = y0 + child.y1 / height * (y1 - y0);
+                        }
+                    })
+        .padding(1)
+        .round(true);
+        var color_f=['#cf4813','#ec2b24','#864d93','#688db9', '#f28e16','#f26862', '#ed7975','#a74a90','#ed4845','#515696', '#9bbcab', '#d6cea9',  '#f1a641', '#f38936'];
+        d3.json('{{dataurl}}').then(function(data){
+	        //console.log(data);
+            root=treemap(d3.hierarchy(data).sum((d) => d.poetrynum).sort((a, b) => b.height-a.height || b.value-a.value)); 
+            console.log(root);
+            links=root.links();           
+            //console.log(links);
+            nodes=root.descendants()      
+            //console.log(nodes);
+            var color = d3.scaleOrdinal().domain(d3.range(data.length))
+			              .range(color_f);
+            var groups = svg.selectAll("g")
+			            .data(nodes.filter(function(d){ return !d.children; }))
+			            .enter()
+			            .append("g");
+                
+                groups.on('click',function(d,i){
+                    console.log(d)
+                    window.open(i.data.yixianglink);
+
+                });
+
+            var tooltip = d3.select("body")
+                            .append("div")
+                            .attr("class","tooltip")
+                            .style("opacity",0.0);
+            var rects = groups.append("rect")
+                        .attr("class","nodeRect")
+				        .attr("x", (d) => d.x0)
+				        .attr('y', (d) => d.y0)
+				        .attr('width', (d) => (d.x1-d.x0))
+				        .attr('height', (d) => (d.y1-d.y0))
+				        .style("fill",function(d,i){return color(i);} )
+                        .on('mouseover',function(d,i){
+                            console.log(i.data.name);
+                            tooltip.html(i.data.name +"-"+i.data.title+"-"+i.data.chapter+ "<br />" +i.data.content )
+			                       .style("left", (d3.pageX) + "px")
+			                       .style("top", (d3.pageY + 20) + "px")
+                                   .attr('font-family',"sans-serif")
+			                       .style("opacity",1.0);
+
+                });
+            var texts = groups.append("text")
+				        .attr("x", (d) => (d.x1 - d.x0) / 2 + d.x0-6)
+				        .attr('y', (d) => (d.y1 - d.y0) / 2 + d.y0)
+				        .attr("dx","0.1em")
+				        .attr("dy","0.5em")
+                        .attr('font-size', (d) => { return 8+d.data.poetrynum/2 + 'px' })
+                        .attr('font-family',"华文行楷")
+				        .text(function(d){ 
+					        return d.data.name})
+                        .attr('fill', 'black');
+                
+        }); 
+      
+
+      
+
+       
+        
+
+        
+        
+    </script>
+</body>
+</html>
